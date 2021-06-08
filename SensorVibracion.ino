@@ -49,12 +49,12 @@ void loop() {
   if(millis()-lastTimeMoved < shakeTime){
     //Logica para activar la alarma o buzzer
     Roja.EncerLed(1);
-      buzz.Alarma(1);
+      buzz.ActivarBuzzer(1);
         delay(1500);
     }else{
       //logica para desactivar la alarma o buzzer
       Roja.EncerLed(0);
-        buzz.Alarma(0);
+        buzz.ActivarBuzzer(0);
     } 
 
 }

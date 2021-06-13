@@ -1,6 +1,11 @@
 //clase para componente sensor de vibracion
 class SensorVibracion{
   public:
+      byte sensorPreviousValue = 0;
+      byte sensorCurrentValue = 0;
+      long lastTimeMoved = 0;
+      byte shakeTime = 200;
+  
       SensorVibracion(byte _pinS){
         pinS = _pinS;
          pinMode(pinS,INPUT);
@@ -19,42 +24,55 @@ class SensorVibracion{
       byte pinS;
 };
 
-//creacion de los objetos de cada clase
+//clase para el buzzer
+class Buzzer{
+  public:
+  Buzzer(byte _pin){
+    pin = _pin;
+    pinMode(pin, OUTPUT);
+  }
+  bool ActivarBuzzer(bool activar){
+    if(activar){
+       tone(pin, 700);      
+    }else{
+       noTone(pin);   
+     
+    }
+  }
+  private:
+  byte pin;
+
+};
+
 SensorVibracion sen(2);
-Led Roja(12);
-Buzzer buzz(8);
+Buzzer buzzer(8);
 
-//Variables globalizadas
-byte sensorPreviousValue = 0;
-byte sensorCurrentValue = 0;
-long lastTimeMoved = 0;
-byte shakeTime = 50;
-
-//----
 
 void setup() {
-  Serial.begin(9600); 
-
+  Serial.begin(9600);
 }
 
 void loop() {
-  //Primera Opcion para el sensor de vibracion
-  sensorCurrentValue = sen.ActivarSensorVibracion();
-  
-  if(sensorPreviousValue != sensorCurrentValue ){
-    lastTimeMoved = millis();
-      sensorPreviousValue = sensorCurrentValue;       
-  }
-  
-  if(millis()-lastTimeMoved < shakeTime){
-    //Logica para activar la alarma o buzzer
-    Roja.EncerLed(1);
-      buzz.ActivarBuzzer(1);
-        delay(1500);
-    }else{
-      //logica para desactivar la alarma o buzzer
-      Roja.EncerLed(0);
-        buzz.ActivarBuzzer(0);
-    } 
+//  sen.sensorCurrentValue = sen.ActivarSensorVibracion();
+//  
+//  if(sen.sensorPreviousValue != sen.sensorCurrentValue ){
+//    sen.lastTimeMoved = millis();
+//      sen.sensorPreviousValue = sen.sensorCurrentValue;       
+//  }
+//  
+//  if(millis()-sen.lastTimeMoved < sen.shakeTime){
+//    //Logica para activar la alarma o buzzer
+//    Serial.println("activado");
+//    buzzer.ActivarBuzzer(1);
+//    delay(200);
+//    }else{
+//        Serial.println("Desactivado");
+//        buzzer.ActivarBuzzer(0);
+//        delay(200);
+//    }
+tone(9, 500);
+delay(200);
+noTone(9);
 
+    
 }

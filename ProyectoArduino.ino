@@ -1,4 +1,4 @@
-
+#include <LiquidCrystal_I2C.h> //Include de libreria para utilizar pantalla LCD
 
 //clase para componente sensor de vibracion
 class SensorVibracion {
@@ -16,7 +16,7 @@ class SensorVibracion {
     bool ActivarSensorVibracion() {
       if (digitalRead(pinS)) {
         return 1;
-      } else {
+      } else {  
         return 0;
       }
     }
@@ -73,7 +73,7 @@ class potenciometro{
         pin=_pin;
             pinMode(pin,INPUT);
     }
-    
+
     int getValor(){
       return analogRead(pin);
     }
@@ -92,14 +92,15 @@ class motorVibracion{
         pin=_pin;
             pinMode(pin,OUTPUT);
       }
-    
-      void potencia(byte valor, int rangoA[3]){
-        analogWrite(pin,adaptarValor(valor,rangoA));
+
+      void potencia(byte valor, int rangoA[2]){
+        digitalWrite(pin,adaptarValor(valor,rangoA));
       }
+      
     private:
       byte pin;
-      const byte rango[3]={0,500,900};
-      byte adaptarValor(int valor, int rangoAlt[3]){
+      const byte rango[2]={0,1023};
+      byte adaptarValor(int valor, int rangoAlt[2]){
         return map(valor,rangoAlt[0],rangoAlt[2],rangoAlt[0],rangoAlt[1]);
       }
 };
@@ -109,15 +110,22 @@ SensorVibracion sen(2);
 Buzzer buzzer(8);
 SensorAgua SensorAgua(A0);
 potenciometro potVibra(A2);
-motorVibracion mot1(8);
+motorVibracion mot1(7);
+LiquidCrystal_I2C lcd(0x27,20,4);
 int lectura;
 
 
 void setup() {
   Serial.begin(9600);
+  lcd.init();                   
+  lcd.backlight();
 }
 
 void loop() {
+ lectura=potVibra.getValor();
+ int rangoPot[2]={0,potVibra.getRango()};
+ mot1.potencia(lectura,rangoPot);
+ 
   sen.sensorCurrentValue = sen.ActivarSensorVibracion();
 
   if (sen.sensorPreviousValue != sen.sensorCurrentValue ) {
@@ -127,7 +135,8 @@ void loop() {
 
   //Logica para activar la alarma o buzzer
   if (millis() - sen.lastTimeMoved < sen.shakeTime) {
-    Serial.println("MOVIMIENTO SISMICO DETECTADO");
+    lcd.clear();
+    lcd.print("SISMO, CORRE!!");
     buzzer.ActivarBuzzer(1);
     delay(500);
   }
@@ -135,11 +144,11 @@ void loop() {
     buzzer.ActivarBuzzer(0);
     delay(500);
   }
-
   
   if(SensorAgua.GetNivelDeAgua() > 500)
   {
-    Serial.println("ALERTA DE INUNDACION");
+    lcd.clear();
+    lcd.print("INUNDADO, CORRE!!");
     buzzer.ActivarBuzzer(1);
     delay(500);
   }
@@ -148,9 +157,5 @@ void loop() {
     buzzer.ActivarBuzzer(0);
     delay(500);
   }
-
- lectura=potVibra.getValor();
- int rangoPot[2]={0,potVibra.getRango()};
- mot1.potencia(lectura,rangoPot);
 
 }

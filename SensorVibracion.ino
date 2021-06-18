@@ -1,10 +1,10 @@
 //clase para componente sensor de vibracion
 class SensorVibracion{
   public:
-      byte sensorPreviousValue = 0;
+      /*byte sensorPreviousValue = 0;
       byte sensorCurrentValue = 0;
       long lastTimeMoved = 0;
-      byte shakeTime = 50;
+      byte shakeTime = 50;*/
   
       SensorVibracion(byte _pinS){
         pinS = _pinS;
@@ -62,7 +62,16 @@ void setup() {
 }
 
 void loop() {
-  sen.sensorCurrentValue = sen.ActivarSensorVibracion();
+  
+    if(sen.ActivarSensorVibracion()){
+      Serial.println("Sensor Activado");
+    		  buzz.ActivarBuzzer(1);
+    			  delay(1000);
+   }else{
+      Serial.println("Sensor desactivado");
+    	  buzz.ActivarBuzzer(0);
+  }
+  /*sen.sensorCurrentValue = sen.ActivarSensorVibracion();
   
   if(sen.sensorPreviousValue != sen.sensorCurrentValue ){
     sen.lastTimeMoved = millis();
@@ -77,7 +86,7 @@ void loop() {
         Serial.println("Desactivado");
           buzzer.ActivarBuzzer(0);
         
-    }
+    }*/
 
 
     

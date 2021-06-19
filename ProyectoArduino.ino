@@ -27,7 +27,7 @@ class SensorVibracion : public Componentes{
 
 };
 
-
+//clase buzzer para modulo que emite alarmas
 class Buzzer : public Componentes{
   public:
     Buzzer(byte _pinC):Componentes(_pinC){
@@ -37,7 +37,7 @@ class Buzzer : public Componentes{
 
     bool ActivarBuzzer(bool activar) {
       if (activar == 1) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 4; i++) {
           digitalWrite(pinC, LOW);
           delay(500);
           digitalWrite(pinC, HIGH);
@@ -81,7 +81,7 @@ class potenciometro : public Componentes{
       const int rango=1023;
 };
 
-
+//clase motor de vibracion
 class motorVibracion : public Componentes{
   public:
       motorVibracion(byte _pinC):Componentes(_pinC){
@@ -119,7 +119,6 @@ motorVibracion mot1(9);
 LiquidCrystal_I2C lcd(0x27,20,4);
 int lectura;
 
-
 void setup() {
   Serial.begin(9600);
   lcd.init();                   
@@ -129,6 +128,11 @@ void setup() {
 void loop() {
  lectura=potVibra.getValor();
  mot1.potencia(lectura);
+ lcd.clear();
+ lcd.setCursor(0,0);
+ lcd.print("Nivel actual");
+ lcd.setCursor(1,1);
+ lcd.print(SensorAgua.GetNivelDeAgua());
 
 if(sen.ActivarSensorVibracion()){
   lcd.clear();
@@ -151,5 +155,5 @@ if(sen.ActivarSensorVibracion()){
     buzzer.ActivarBuzzer(0);
     delay(500);
   }
-
+  
 }

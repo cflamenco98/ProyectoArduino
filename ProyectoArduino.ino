@@ -4,10 +4,10 @@
 class Componentes{
   public:
     Componentes(byte _pinC){
-      _pinC = _pinC;
+      pinC = _pinC;
     }
   protected:
-    byte _pinC;
+    byte pinC;
 };
 
 class SensorVibracion : public Componentes{

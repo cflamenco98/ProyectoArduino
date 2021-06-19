@@ -13,11 +13,11 @@ class Componentes{
 class SensorVibracion : public Componentes{
   public: 
       SensorVibracion(byte _pinC):Componentes(_pinC){
-         pinMode(_pinC,INPUT);       
+         pinMode(pinC,INPUT);       
       }
     
   bool ActivarSensorVibracion(){
-    if(digitalRead(_pinC)){
+    if(digitalRead(pinC)){
       return 1;
     }else{
       return 0;
@@ -28,23 +28,23 @@ class SensorVibracion : public Componentes{
 };
 
 
-class Buzzer: public Componentes{
+class Buzzer : public Componentes{
   public:
     Buzzer(byte _pinC):Componentes(_pinC){
-     pinMode(_pinC, OUTPUT);
-      digitalWrite(_pinC, HIGH);
+     pinMode(pinC, OUTPUT);
+      digitalWrite(pinC, HIGH);
     }
 
     bool ActivarBuzzer(bool activar) {
       if (activar == 1) {
         for (int i = 0; i < 2; i++) {
-          digitalWrite(_pinC, LOW);
+          digitalWrite(pinC, LOW);
           delay(500);
-          digitalWrite(_pinC, HIGH);
+          digitalWrite(pinC, HIGH);
           delay(500);
         }
       } else {
-        digitalWrite(_pinC, HIGH);
+        digitalWrite(pinC, HIGH);
         delay(500);
       }
     }
@@ -55,24 +55,24 @@ class Buzzer: public Componentes{
 class SensorAgua:public Componentes{
   public:
     SensorAgua(byte _pinC):Componentes(_pinC) {
-      pinMode(_pinC, INPUT);
+      pinMode(pinC, INPUT);
     }
 
     int GetNivelDeAgua() {
-      return  analogRead(_pinC);
+      return  analogRead(pinC);
     }
 
 };
 
 //clase potenciometro para controlar vibraciones del motor
-class potenciometro:public Componentes{
+class potenciometro : public Componentes{
   public:
       potenciometro(byte _pinC):Componentes(_pinC){
-            pinMode(_pinC,INPUT);
+            pinMode(pinC,INPUT);
     }
 
     int getValor(){
-      return analogRead(_pinC);
+      return analogRead(pinC);
     }
     int getRango(){
       return rango;
@@ -82,21 +82,21 @@ class potenciometro:public Componentes{
 };
 
 
-class motorVibracion:Componentes{
+class motorVibracion : public Componentes{
   public:
       motorVibracion(byte _pinC):Componentes(_pinC){
-            pinMode(_pinC,OUTPUT);
+            pinMode(pinC,OUTPUT);
       }
 
       void potencia(byte valor){
         if(valor > 100)
         {
-          digitalWrite(_pinC, HIGH);
+          digitalWrite(pinC, HIGH);
           delay(200);
         }
         else
         {
-          digitalWrite(_pinC, LOW);
+          digitalWrite(pinC, LOW);
           delay(200);
         }
         

@@ -1,93 +1,155 @@
-//clase para componente sensor de vibracion
-class SensorVibracion{
+#include <LiquidCrystal_I2C.h> //Include de libreria para utilizar pantalla LCD
+
+//Clase Padre de los componentes
+class Componentes{
   public:
-      /*byte sensorPreviousValue = 0;
-      byte sensorCurrentValue = 0;
-      long lastTimeMoved = 0;
-      byte shakeTime = 50;*/
-  
-      SensorVibracion(byte _pinS){
-        pinS = _pinS;
-         pinMode(pinS,INPUT);
-        
+    Componentes(byte _pinC){
+      _pinC = _pinC;
+    }
+  protected:
+    byte _pinC;
+};
+
+class SensorVibracion : public Componentes{
+  public: 
+      SensorVibracion(byte _pinC):Componentes(_pinC){
+         pinMode(_pinC,INPUT);       
       }
     
   bool ActivarSensorVibracion(){
-    if(digitalRead(pinS)){
+    if(digitalRead(_pinC)){
       return 1;
     }else{
       return 0;
     }
   
   }
-    private:
-      byte pinS;
+
 };
 
-class Buzzer{
+class Buzzer: public Componentes{
   public:
-  Buzzer(byte _pin){
-    pin = _pin;
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin,HIGH);
-  }
-  
-  bool ActivarBuzzer(bool activar){
-     if(activar == 1){
-      for(int i=0; i<4; i++){
-        Serial.println("Activado");
-        digitalWrite(pin,LOW);
-        delay(1000);
-        digitalWrite(pin,HIGH);
-        delay(1000);
+    Buzzer(byte _pinC):Componentes(_pinC){
+     pinMode(_pinC, OUTPUT);
+      digitalWrite(_pinC, HIGH);
     }
-    }else{   
-        Serial.println("Desactivado");
-        digitalWrite(pin,HIGH);
-        delay(1000);
-    
+
+    bool ActivarBuzzer(bool activar) {
+      if (activar == 1) {
+        for (int i = 0; i < 2; i++) {
+          digitalWrite(_pinC, LOW);
+          delay(500);
+          digitalWrite(_pinC, HIGH);
+          delay(500);
+        }
+      } else {
+        digitalWrite(_pinC, HIGH);
+        delay(500);
+      }
     }
-  }
-  private:
-  byte pin;
 
 };
 
+//clase sensor de agua
+class SensorAgua:public Componentes{
+  public:
+    SensorAgua(byte _pinC):Componentes(_pinC) {
+      pinMode(_pinC, INPUT);
+    }
+
+    int GetNivelDeAgua() {
+      return  analogRead(_pinC);
+    }
+
+};
+
+//clase potenciometro para controlar vibraciones del motor
+class potenciometro:public Componentes{
+  public:
+      potenciometro(byte _pinC):Componentes(_pinC){
+            pinMode(_pinC,INPUT);
+    }
+
+    int getValor(){
+      return analogRead(_pinC);
+    }
+  
+    int getRango(){
+      return rango;
+    }
+    private:
+      const int rango=1023;
+};
+
+
+class motorVibracion:Componentes{
+  public:
+      motorVibracion(byte _pinC):Componentes(_pinC){
+            pinMode(_pinC,OUTPUT);
+      }
+
+      void potencia(byte valor){
+        if(valor > 100)
+        {
+          digitalWrite(_pinC, HIGH);
+          delay(200);
+        }
+        else
+        {
+          digitalWrite(_pinC, LOW);
+          delay(200);
+        }
+        
+      }
+      
+    private:
+      //byte pin;
+      const byte rango[2]={0,1023};
+      byte adaptarValor(int valor, int rangoAlt[2]){
+        return map(valor,rangoAlt[0],rangoAlt[2],rangoAlt[0],rangoAlt[1]);
+      }
+};
+
+//Instancias de objetos/variables globales
 SensorVibracion sen(2);
 Buzzer buzzer(8);
+SensorAgua SensorAgua(A0);
+potenciometro potVibra(A2);
+motorVibracion mot1(9);
+LiquidCrystal_I2C lcd(0x27,20,4);
+int lectura;
 
 
 void setup() {
   Serial.begin(9600);
+  lcd.init();                   
+  lcd.backlight();
 }
 
 void loop() {
-  
-    if(sen.ActivarSensorVibracion()){
-      Serial.println("Sensor Activado");
-    		  buzz.ActivarBuzzer(1);
-    			  delay(1000);
+ lectura=potVibra.getValor();
+ mot1.potencia(lectura);
+
+if(sen.ActivarSensorVibracion()){
+  lcd.clear();
+    lcd.print("SISMO, CORRE!!");
+          buzzer.ActivarBuzzer(1);
    }else{
       Serial.println("Sensor desactivado");
-    	  buzz.ActivarBuzzer(0);
-  }
-  /*sen.sensorCurrentValue = sen.ActivarSensorVibracion();
-  
-  if(sen.sensorPreviousValue != sen.sensorCurrentValue ){
-    sen.lastTimeMoved = millis();
-      sen.sensorPreviousValue = sen.sensorCurrentValue;       
+        buzzer.ActivarBuzzer(0);
   }
   
-  if(millis()-sen.lastTimeMoved < sen.shakeTime){
-    //Logica para activar la alarma o buzzer
-    Serial.println("activado");
-      buzzer.ActivarBuzzer(1);
-  }else{
-        Serial.println("Desactivado");
-          buzzer.ActivarBuzzer(0);
-        
-    }*/
+  if(SensorAgua.GetNivelDeAgua() > 500)
+  {
+    lcd.clear();
+    lcd.print("INUNDADO, CORRE!!");
+    buzzer.ActivarBuzzer(1);
+    delay(500);
+  }
+  else
+  {
+    buzzer.ActivarBuzzer(0);
+    delay(500);
+  }
 
-
-    
 }

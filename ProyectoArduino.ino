@@ -1,112 +1,109 @@
 #include <LiquidCrystal_I2C.h> //Include de libreria para utilizar pantalla LCD
 
-//clase para componente sensor de vibracion
-class SensorVibracion{
+//Clase padre de los Componentes
+class Componentes{
   public:
-  
-      SensorVibracion(byte _pinS){
-        pinS = _pinS;
-         pinMode(pinS,INPUT);
-        
+    Componentes(byte _pinC){
+      _pinC = _pinC;
+    }
+  protected:
+    byte _pinC;
+};
+
+class SensorVibracion : public Componentes{
+  public: 
+      SensorVibracion(byte _pinC):Componentes(_pinC){
+         pinMode(_pinC,INPUT);       
       }
     
   bool ActivarSensorVibracion(){
-    if(digitalRead(pinS)){
+    if(digitalRead(_pinC)){
       return 1;
     }else{
       return 0;
     }
   
   }
-    private:
-      byte pinS;
+
 };
 
-//clase para componente buzzer para emitir sonidos de alerta
-class Buzzer {
+
+class Buzzer: public Componentes{
   public:
-    Buzzer(byte _pin) {
-      pin = _pin;
-      pinMode(pin, OUTPUT);
-      digitalWrite(pin, HIGH);
+    Buzzer(byte _pinC):Componentes(_pinC){
+     pinMode(_pinC, OUTPUT);
+      digitalWrite(_pinC, HIGH);
     }
 
     bool ActivarBuzzer(bool activar) {
       if (activar == 1) {
         for (int i = 0; i < 2; i++) {
-          digitalWrite(pin, LOW);
+          digitalWrite(_pinC, LOW);
           delay(500);
-          digitalWrite(pin, HIGH);
+          digitalWrite(_pinC, HIGH);
           delay(500);
         }
       } else {
-        digitalWrite(pin, HIGH);
+        digitalWrite(_pinC, HIGH);
         delay(500);
       }
     }
-  private:
-    byte pin;
+
 };
 
 //clase sensor de agua
-class SensorAgua {
+class SensorAgua:public Componentes{
   public:
-    SensorAgua(byte _analogPin) {
-      analogPin = _analogPin;
-      pinMode(analogPin, INPUT);
+    SensorAgua(byte _pinC):Componentes(_pinC) {
+      pinMode(_pinC, INPUT);
     }
 
     int GetNivelDeAgua() {
-      return  analogRead(analogPin);
+      return  analogRead(_pinC);
     }
 
-  private:
-    byte analogPin;
 };
 
 //clase potenciometro para controlar vibraciones del motor
-class potenciometro{
+class potenciometro:public Componentes{
   public:
-      potenciometro(byte _pin){
-        pin=_pin;
-            pinMode(pin,INPUT);
+      potenciometro(byte _pinC):Componentes(_pinC){
+            pinMode(_pinC,INPUT);
     }
 
     int getValor(){
-      return analogRead(pin);
+      return analogRead(_pinC);
     }
     int getRango(){
       return rango;
     }
     private:
-      byte pin;
       const int rango=1023;
 };
 
-//clase motor de vibracion
-class motorVibracion{
+
+class motorVibracion:Componentes{
   public:
-      motorVibracion(byte _pin){
-        pin=_pin;
-            pinMode(pin,OUTPUT);
+      motorVibracion(byte _pinC):Componentes(_pinC){
+            pinMode(_pinC,OUTPUT);
       }
 
       void potencia(byte valor){
         if(valor > 100)
         {
-          digitalWrite(pin, HIGH);
+          digitalWrite(_pinC, HIGH);
           delay(200);
         }
         else
         {
-          digitalWrite(pin, LOW);
+          digitalWrite(_pinC, LOW);
           delay(200);
         }
         
       }
       
     private:
-      byte pin;
+      //byte pin;
       const byte rango[2]={0,1023};
       byte adaptarValor(int valor, int rangoAlt[2]){
         return map(valor,rangoAlt[0],rangoAlt[2],rangoAlt[0],rangoAlt[1]);

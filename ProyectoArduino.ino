@@ -1,27 +1,25 @@
 #include <LiquidCrystal_I2C.h> //Include de libreria para utilizar pantalla LCD
 
 //clase para componente sensor de vibracion
-class SensorVibracion {
+class SensorVibracion{
   public:
-    byte sensorPreviousValue = 0;
-    byte sensorCurrentValue = 0;
-    long lastTimeMoved = 0;
-    byte shakeTime = 50;
-
-    SensorVibracion(byte _pinS) {
-      pinS = _pinS;
-      pinMode(pinS, INPUT);
-    }
-
-    bool ActivarSensorVibracion() {
-      if (digitalRead(pinS)) {
-        return 1;
-      } else {  
-        return 0;
+  
+      SensorVibracion(byte _pinS){
+        pinS = _pinS;
+         pinMode(pinS,INPUT);
+        
       }
+    
+  bool ActivarSensorVibracion(){
+    if(digitalRead(pinS)){
+      return 1;
+    }else{
+      return 0;
     }
-  private:
-    byte pinS;
+  
+  }
+    private:
+      byte pinS;
 };
 
 //clase para componente buzzer para emitir sonidos de alerta
@@ -93,8 +91,18 @@ class motorVibracion{
             pinMode(pin,OUTPUT);
       }
 
-      void potencia(byte valor, int rangoA[2]){
-        digitalWrite(pin,adaptarValor(valor,rangoA));
+      void potencia(byte valor){
+        if(valor > 100)
+        {
+          digitalWrite(pin, HIGH);
+          delay(200);
+        }
+        else
+        {
+          digitalWrite(pin, LOW);
+          delay(200);
+        }
+        
       }
       
     private:
@@ -110,7 +118,7 @@ SensorVibracion sen(2);
 Buzzer buzzer(8);
 SensorAgua SensorAgua(A0);
 potenciometro potVibra(A2);
-motorVibracion mot1(7);
+motorVibracion mot1(9);
 LiquidCrystal_I2C lcd(0x27,20,4);
 int lectura;
 
@@ -123,26 +131,15 @@ void setup() {
 
 void loop() {
  lectura=potVibra.getValor();
- int rangoPot[2]={0,potVibra.getRango()};
- mot1.potencia(lectura,rangoPot);
- 
-  sen.sensorCurrentValue = sen.ActivarSensorVibracion();
+ mot1.potencia(lectura);
 
-  if (sen.sensorPreviousValue != sen.sensorCurrentValue ) {
-    sen.lastTimeMoved = millis();
-    sen.sensorPreviousValue = sen.sensorCurrentValue;
-  }
-
-  //Logica para activar la alarma o buzzer
-  if (millis() - sen.lastTimeMoved < sen.shakeTime) {
-    lcd.clear();
+if(sen.ActivarSensorVibracion()){
+  lcd.clear();
     lcd.print("SISMO, CORRE!!");
-    buzzer.ActivarBuzzer(1);
-    delay(500);
-  }
-  else {
-    buzzer.ActivarBuzzer(0);
-    delay(500);
+          buzzer.ActivarBuzzer(1);
+   }else{
+      Serial.println("Sensor desactivado");
+        buzzer.ActivarBuzzer(0);
   }
   
   if(SensorAgua.GetNivelDeAgua() > 500)
